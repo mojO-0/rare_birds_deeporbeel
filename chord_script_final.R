@@ -129,7 +129,10 @@ plot_chord <- function(edges, dest_base_colors, dest_colors_name,
   # Ribbon color = color of the originating family (origin -> destination)
   link_colors <- adjustcolor(fam_colors[edges$from], alpha.f = 0.55)
   
-  pdf(out_file, width = 16, height = 16)
+  for (device in c("pdf", "svg")) {
+    out <- if (device == "pdf") out_file else sub("\\.pdf$", ".svg", out_file)
+    if (device == "pdf") pdf(out, width = 16, height = 16)
+    if (device == "svg") svg(out, width = 16, height = 16)
   par(bg = "white", mar = c(1,1,4,1))
   circos.clear()
   
@@ -166,7 +169,7 @@ plot_chord <- function(edges, dest_base_colors, dest_colors_name,
         facing      = "clockwise",
         niceFacing  = TRUE,
         adj         = c(0, 0.5),
-        cex         = ifelse(sector %in% fam_nodes, 0.70, 0.9),
+        cex         = ifelse(sector %in% fam_nodes, 1, 1.5),
         font        = ifelse(sector %in% fam_nodes, 1, 2),
         col         = ifelse(sector %in% fam_nodes, "grey20", "black")
       )
@@ -174,8 +177,8 @@ plot_chord <- function(edges, dest_base_colors, dest_colors_name,
     bg.border = NA
   )
   
-  title(main = title, cex.main = 1.3, font.main = 2, line = 2)
-  mtext(subtitle, side = 3, line = 0.5, cex = 0.85, col = "grey30")
+  title(main = title, cex.main = 1.6, font.main = 2, line = 2)
+  mtext(subtitle, side = 3, line = 0.8, cex = 0.85, col = "grey30")
   
   legend(
     "bottomright",
@@ -183,14 +186,16 @@ plot_chord <- function(edges, dest_base_colors, dest_colors_name,
     fill    = dest_colors,
     border  = NA,
     bty     = "n",
-    cex     = 0.7,
+    cex       = 1.0,
+    title.cex = 1.4,
     title   = dest_colors_name,
     title.col = "grey20"
   )
   
   circos.clear()
   dev.off()
-  message("Saved: ", out_file)
+  } # end device loop
+  message("Saved: ", out_file, " + .svg")
 }
 
 # ---------------------------------------------------------------------------
